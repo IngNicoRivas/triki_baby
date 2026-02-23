@@ -2,6 +2,39 @@ import streamlit as st
 
 st.set_page_config(page_title="El bebé de Camilo & Angelica", layout="centered")
 
+# --- ESTILO CSS PERSONALIZADO ---
+st.markdown("""
+    <style>
+    .main {
+        background-color: #fdfaf5;
+    }
+    .stButton>button {
+        border-radius: 20px;
+        border: 2px solid #f0f2f6;
+        transition: all 0.3s;
+    }
+    .stButton>button:hover {
+        border-color: #ffb7c5;
+        transform: scale(1.02);
+    }
+    /* Aviso para celulares */
+    @media only screen and (max-width: 600px) {
+        .mobile-warn {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    }
+    @media only screen and (min-width: 601px) {
+        .mobile-warn { display: none; }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 if "tablero" not in st.session_state:
     st.session_state.tablero = [["" for _ in range(3)] for _ in range(3)]
     st.session_state.turno = None
@@ -14,7 +47,7 @@ if "tablero" not in st.session_state:
 revelacion_map = {
     (0,0): "Niño", (1,1): "Niño", (2,0): "Niño", (2,1): "Niño",
     (0,2): "Niña", (1,2): "Niña", (1,0): "Niña", (0,1): "Niña",
-    (2,2): "Dinos cuál es"
+    (2,2): "¡Abre el sobre!"
 }
 
 def verificar_ganador(tablero):
@@ -29,10 +62,12 @@ def verificar_ganador(tablero):
         return True
     return False
 
+st.markdown('<div class="mobile-warn">📱 Desde celular por favor, girarlo de forma horizontal 🔄</div>', unsafe_allow_html=True)
 
 # --- VISTA 1: MODO REVELACIÓN ---
 if st.session_state.modo_revelacion:
-    st.title("🕵️‍♂️ ¿Qué se esconde aquí?")
+    st.title("🕵️‍♂️ Descubre el ganador")
+    st.info("Haz clic en los cuadros para descubrir qué hay detrás de cada posición.")
 
     for i in range(3):
         cols = st.columns(3)
@@ -60,15 +95,22 @@ else:
     st.title("👶 El bebé de Camilo & Angelica")
 
     if st.session_state.jugador1 is None:
+        with st.expander("📖 ¿Cómo jugar? (Instrucciones)", expanded=True):
+            st.write("""
+            1. **Elige tu bando:** Selecciona si crees que el bebé será Niño o Niña.
+            2. **El Triki:** El objetivo es completar una línea de 3 (horizontal, vertical o diagonal).
+            3. **Turnos:** El juego alternará automáticamente entre Niño y Niña.
+            4. **El Final:** Al terminar, ¡podrás acceder a la pantalla secreta de revelación!
+            """)
         st.markdown("<h3 style='text-align: center;'>🤔 ¿Qué crees que será el bebé?</h3>", unsafe_allow_html=True)
         st.write("<p style='text-align: center; color: gray;'>Selecciona tu predicción para empezar a jugar:</p>",unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("💙 Niño", use_container_width=True):
+            if st.button("💙 ¡Es Niño!", use_container_width=True):
                 st.session_state.jugador1, st.session_state.turno = "Niño", "Niño"
                 st.rerun()
         with col2:
-            if st.button("💗 Niña", use_container_width=True):
+            if st.button("💗 ¡Es Niña!", use_container_width=True):
                 st.session_state.jugador1, st.session_state.turno = "Niña", "Niña"
                 st.rerun()
 
@@ -93,7 +135,7 @@ else:
                     cols[j].markdown(f"<div style='text-align:center; color:{color}; font-weight:bold;'>{valor}</div>", unsafe_allow_html=True)
 
     if st.session_state.ganador:
-        st.success(f"🎉 Felicitaciones el bebé es: {st.session_state.ganador}")
+        st.success(f"🎉 ¡Felicidades! Ganó el bando: {st.session_state.ganador}")
         c1, c2 = st.columns(2)
         if c1.button("Volver a Jugar"):
             st.session_state.clear() # Limpia todo para empezar de cero
@@ -101,4 +143,5 @@ else:
         if c2.button("🚀 Ir al Modo Revelación"):
             st.session_state.modo_revelacion = True
             st.rerun()
+
 
