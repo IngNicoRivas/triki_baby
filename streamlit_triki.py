@@ -1,4 +1,4 @@
-mport streamlit as st
+import streamlit as st
 
 st.set_page_config(page_title="El bebé de Camilo & Angelica", layout="centered")
 
@@ -150,3 +150,4 @@ if st.session_state.ganador:
     if st.button("🔄 Reiniciar Juego", use_container_width=True):
         st.session_state.clear()
         st.rerun()
+
